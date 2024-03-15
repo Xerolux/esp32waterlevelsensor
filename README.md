@@ -28,7 +28,7 @@ Before using the code in this repository, make sure you have the following:
 5. Upload the code to your ESP32 board.
 
 ## Webserver to show data
-http://<your-ip>/data
+http://*your-ip*/data
 
 ## Configuration
 
