@@ -43,3 +43,8 @@ Before uploading the code, make sure to modify the following variables in the `J
 #define lastwill_text    "offline"
 #define OTA_HOSTNAME     "esp32-water-level" // Hostname for OTA
 #define OTA_PASSWORD     "1234asdf" // Password for OTA (optional)
+
+## Webserver for data
+
+```cpp
+http://0.0.0.0/data
