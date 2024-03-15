@@ -1,6 +1,7 @@
 # ESP32 JSN-SR04T Sensor
 
 This repository contains code for an ESP32-based water level sensor using the JSN-SR04T ultrasonic sensor. The sensor measures the distance to the water surface and publishes the data to an MQTT broker. Additionally, it provides an HTTP endpoint to query the current water level and supports over-the-air (OTA) updates for firmware upgrades.
+Support for HomeAssistant (MQTT Discovery)
 
 ## Hardware Components
 
@@ -32,7 +33,7 @@ http://*your-ip*/data
 
 ## Configuration
 
-Before uploading the code, make sure to modify the following variables in the `JSN-SR04T.ino` file to match your specific configuration:
+Before uploading the code, make sure to modify the following variables in the `esp32waterlevelsensor.ino` file to match your specific configuration:
 
 ```cpp
 #define WIFI_SSID        "your_wifi_ssid"
