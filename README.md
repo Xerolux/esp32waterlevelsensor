@@ -27,6 +27,9 @@ Before using the code in this repository, make sure you have the following:
 4. Select the appropriate board and port from the Arduino IDE's `Tools` menu.
 5. Upload the code to your ESP32 board.
 
+## Webserver to show data
+http://0.0.0.0/data
+
 ## Configuration
 
 Before uploading the code, make sure to modify the following variables in the `JSN-SR04T.ino` file to match your specific configuration:
@@ -43,8 +46,3 @@ Before uploading the code, make sure to modify the following variables in the `J
 #define lastwill_text    "offline"
 #define OTA_HOSTNAME     "esp32-water-level" // Hostname for OTA
 #define OTA_PASSWORD     "1234asdf" // Password for OTA (optional)
-
-## Webserver for data
-
-```cpp
-http://0.0.0.0/data
