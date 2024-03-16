@@ -30,7 +30,7 @@ String client_name = CLIENT_NAME;
 String startup_topic = "waterlevel/Status";
 String water_level_topic = "waterlevel/Distanz";
 
-unsigned long event_interval = 15000;
+unsigned long event_interval = 60000;  // every minute
 unsigned long previous_time = 0;
 
 EspMQTTClient client(
