@@ -33,6 +33,7 @@ http://*your-ip*/data
 
 ## Adjust the interval
 http://*your-ip*/adjust_interval?interval=******
+
 for example 15 sec. :
 http://*your-ip*/adjust_interval?interval=15000
 
