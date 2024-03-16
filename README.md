@@ -23,7 +23,7 @@ Before using the code in this repository, make sure you have the following:
 ## Installation and Setup
 
 1. Clone or download this repository to your local machine.
-2. Open the Arduino IDE and navigate to `File > Open` to open the `JSN-SR04T.ino` file.
+2. Open the Arduino IDE and navigate to `File > Open` to open the `esp32waterlevelsensor.ino` file.
 3. Connect your ESP32 board to your computer via USB.
 4. Select the appropriate board and port from the Arduino IDE's `Tools` menu.
 5. Upload the code to your ESP32 board.
