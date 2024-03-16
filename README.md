@@ -31,6 +31,11 @@ Before using the code in this repository, make sure you have the following:
 ## Webserver to show data
 http://*your-ip*/data
 
+## Adjust the interal
+http://*your-ip*/adjust_interval?interval=******
+for example 15 sec. :
+http://*your-ip*/adjust_interval?interval=15000
+
 ## Configuration
 
 Before uploading the code, make sure to modify the following variables in the `esp32waterlevelsensor.ino` file to match your specific configuration:
