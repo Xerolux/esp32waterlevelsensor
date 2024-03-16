@@ -1,9 +1,12 @@
 #include "EspMQTTClient.h"
+extern "C" {
+#include "esp_wpa2.h"  // Include the WPA2 library for Enterprise
+}
 #include <WiFi.h>
 #include <AsyncTCP.h>
 #include <ESPAsyncWebServer.h>
-#include <Update.h> // Library for OTA updates
-#include <ArduinoJson.h> // Library for handling JSON
+#include <Update.h>       // Library for OTA updates
+#include <ArduinoJson.h>  // Library for handling JSON
 
 #define WIFI_SSID        "your_wifi_ssid"
 #define WIFI_PASS        "your_wifi_password"
@@ -17,22 +20,27 @@
 #define OTA_HOSTNAME     "esp32-water-level" // Hostname for OTA
 #define OTA_PASSWORD     "1234asdf" // Password for OTA (optional)
 
-String  client_name       = CLIENT_NAME;
-String  startup_topic     = "waterlevel/Status";
-String  water_level_topic = "waterlevel/Distanz";
+// Define your static IP address and network parameters
+IPAddress local_IP(192, 168, 180, 250);  // Example IP, change to fit your network
+IPAddress gateway(192, 168, 180, 1);     // Your network gateway
+IPAddress subnet(255, 255, 255, 0);      // Your network subnet
+IPAddress primaryDNS(192, 168, 180, 1);  // Optional: DNS
 
-const unsigned long event_interval = 15000;
+String client_name = CLIENT_NAME;
+String startup_topic = "waterlevel/Status";
+String water_level_topic = "waterlevel/Distanz";
+
+unsigned long event_interval = 15000;
 unsigned long previous_time = 0;
 
 EspMQTTClient client(
-                  WIFI_SSID,
-                  WIFI_PASS,
-                  BROKER_IP,
-                  BROKER_USERNAME,
-                  BROKER_PASSWORD,
-                  CLIENT_NAME,
-                  BROKER_PORT
-                  );
+  WIFI_SSID,
+  WIFI_PASS,
+  BROKER_IP,
+  BROKER_USERNAME,
+  BROKER_PASSWORD,
+  CLIENT_NAME,
+  BROKER_PORT);
 
 #define TRIG 14
 #define ECHO 12
@@ -44,6 +52,15 @@ AsyncWebServer server(80);
 void setup() {
   Serial.begin(115200);
 
+  // Configure static IP
+  if (!WiFi.config(local_IP, gateway, subnet, primaryDNS)) {
+    Serial.println("STA Failed to configure");
+  }
+
+  // Initialize WiFi for WPA2 Enterprise
+  WiFi.disconnect(true);  // Disconnect any existing connections
+  WiFi.mode(WIFI_STA);    // Set to STA mode
+
   WiFi.begin(WIFI_SSID, WIFI_PASS);
   while (WiFi.status() != WL_CONNECTED) {
     delay(1000);
@@ -51,23 +68,37 @@ void setup() {
   }
   Serial.println(WiFi.localIP());
 
-  server.on("/data", HTTP_GET, [](AsyncWebServerRequest *request){
+  server.on("/data", HTTP_GET, [](AsyncWebServerRequest *request) {
     String content = "Distance: " + String(distance) + " cm - Timestamp: " + String(millis());
-    if (content.length() > 0) {
-        request->send(200, "text/plain", content);
-        Serial.println("Response sent successfully");
+    request->send(200, "text/plain", content);
+    Serial.println("Response sent successfully");
+  });
+
+  // Handler to adjust the event_interval
+  server.on("/adjust_interval", HTTP_GET, [](AsyncWebServerRequest *request) {
+    if (request->hasParam("interval")) {
+      String intervalStr = request->getParam("interval")->value();
+      int newInterval = intervalStr.toInt();
+      if (newInterval > 0) {  // Basic validation
+        event_interval = newInterval;
+        request->send(200, "text/plain", "Interval updated");
+        Serial.println("Interval updated to " + String(event_interval));
+      } else {
+        request->send(400, "text/plain", "Invalid interval");
+        Serial.println("Invalid interval received");
+      }
     } else {
-        request->send(500, "text/plain", "Error: No data available");
-        Serial.println("Error: No data available");
+      request->send(400, "text/plain", "Interval parameter missing");
+      Serial.println("Interval parameter missing");
     }
   });
 
   server.begin();
-  
+
   client.enableDebuggingMessages();
   client.enableHTTPWebUpdater();
   client.enableLastWillMessage(lastwill_topic, lastwill_text);
-  
+
   pinMode(TRIG, OUTPUT);
   pinMode(ECHO, INPUT_PULLUP);
 
@@ -85,23 +116,23 @@ void onConnectionEstablished() {
   client.publish(startup_topic, String(client_name + " is now online."));
 }
 
-void loop() { 
-  client.loop(); 
+void loop() {
+  client.loop();
 
   unsigned long current_time = millis();
 
-  if(current_time - previous_time >= event_interval) {
-    digitalWrite(TRIG, LOW); 
-    delayMicroseconds(2); 
+  if (current_time - previous_time >= event_interval) {
+    digitalWrite(TRIG, LOW);
+    delayMicroseconds(2);
 
-    digitalWrite(TRIG, HIGH);  
-    delayMicroseconds(20); 
+    digitalWrite(TRIG, HIGH);
+    delayMicroseconds(20);
 
-    digitalWrite(TRIG, LOW);  
+    digitalWrite(TRIG, LOW);
 
-    distance = pulseIn(ECHO, HIGH, 26000);  
+    distance = pulseIn(ECHO, HIGH, 26000);
 
-    distance = distance / 58; 
+    distance = distance / 58;
 
     Serial.print("Distance ");
     Serial.print(distance);
@@ -114,7 +145,6 @@ void loop() {
 
   // Handle OTA update
   ArduinoOTA.handle();
-  
 }
 
 void publishHomeAssistantDiscovery() {
