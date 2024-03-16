@@ -31,7 +31,7 @@ Before using the code in this repository, make sure you have the following:
 ## Webserver to show data
 http://*your-ip*/data
 
-## Adjust the interal
+## Adjust the interval
 http://*your-ip*/adjust_interval?interval=******
 for example 15 sec. :
 http://*your-ip*/adjust_interval?interval=15000
